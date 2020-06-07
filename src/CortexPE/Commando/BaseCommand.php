@@ -36,8 +36,8 @@ use CortexPE\Commando\traits\ArgumentableTrait;
 use CortexPE\Commando\traits\IArgumentable;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 use pocketmine\utils\TextFormat;
 use function array_shift;
 use function array_unique;
@@ -46,7 +46,7 @@ use function count;
 use function dechex;
 use function str_replace;
 
-abstract class BaseCommand extends Command implements IArgumentable, IRunnable, PluginIdentifiableCommand {
+abstract class BaseCommand extends Command implements IArgumentable, IRunnable, PluginOwned {
 	use ArgumentableTrait;
 
 	public const ERR_INVALID_ARG_VALUE = 0x01;
@@ -91,6 +91,11 @@ abstract class BaseCommand extends Command implements IArgumentable, IRunnable, 
 	}
 
 	public function getPlugin(): Plugin {
+		return $this->plugin;
+	}
+
+	public function getOwningPlugin(): Plugin
+	{
 		return $this->plugin;
 	}
 
