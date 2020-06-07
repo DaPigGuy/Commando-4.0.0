@@ -8,4 +8,4 @@ A detailed instruction on how to use this can be found [here](https://github.com
 https://poggit.pmmp.io/ci/ParoxityTeam/Commando
 
 -----
-**This framework was made with :heart: by CortexPE, the fork however is currently being maintained by ParoxityTeam. Enjoy!~ :3**
+**This framework was made with :heart: by CortexPE. Fork for PMMP 3.0 maintained by ParoxityTeam. Ported to PMMP 4.0 by DaPigGuy. Enjoy!~ :3**
