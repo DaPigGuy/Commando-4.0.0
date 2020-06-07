@@ -38,8 +38,8 @@ use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
-use pocketmine\network\mcpe\protocol\types\CommandEnum;
-use pocketmine\network\mcpe\protocol\types\CommandParameter;
+use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
+use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
 use pocketmine\plugin\Plugin;
 use pocketmine\Server;
 use function array_unshift;
@@ -72,22 +72,24 @@ class PacketHooker implements Listener {
 	 * @priority        LOWEST
 	 * @ignoreCancelled true
 	 */
-	public function onPacketSend(DataPacketSendEvent $ev): void {
-		$pk = $ev->getPacket();
-		if($pk instanceof AvailableCommandsPacket) {
-			$p = $ev->getPlayer();
-			foreach($pk->commandData as $commandName => $commandData) {
-				$cmd = $this->map->getCommand($commandName);
-				if($cmd instanceof BaseCommand) {
-					foreach($cmd->getConstraints() as $constraint){
-						if(!$constraint->isVisibleTo($p)){
-							continue 2;
+	public function onPacketSend(DataPacketSendEvent $ev): void
+	{
+		foreach ($ev->getPackets() as $pk) {
+			if ($pk instanceof AvailableCommandsPacket) {
+				$p = $ev->getTargets()[array_keys($ev->getTargets())[0]]->getPlayer();
+				foreach ($pk->commandData as $commandName => $commandData) {
+					$cmd = $this->map->getCommand($commandName);
+					if ($cmd instanceof BaseCommand) {
+						foreach ($cmd->getConstraints() as $constraint) {
+							if (!$constraint->isVisibleTo($p)) {
+								continue 2;
+							}
 						}
+						$pk->commandData[$commandName]->overloads = self::generateOverloads($p, $cmd);
 					}
-					$pk->commandData[$commandName]->overloads = self::generateOverloads($p, $cmd);
 				}
+				$pk->softEnums = SoftEnumStore::getEnums();
 			}
-			$pk->softEnums = SoftEnumStore::getEnums();
 		}
 	}
 
@@ -113,9 +115,7 @@ class PacketHooker implements Listener {
 			$scParam->paramName = $label;
 			$scParam->paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_FLAG_ENUM;
 			$scParam->isOptional = false;
-			$scParam->enum = new CommandEnum();
-			$scParam->enum->enumName = $label;
-			$scParam->enum->enumValues = [$label];
+			$scParam->enum = new CommandEnum($label, [$label]);
 
 			$overloadList = self::generateOverloads($cs, $subCommand);
 			if(!empty($overloadList)){
