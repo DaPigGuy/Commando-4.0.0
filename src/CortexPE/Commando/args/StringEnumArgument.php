@@ -60,7 +60,7 @@ abstract class StringEnumArgument extends BaseArgument {
 	}
 
 	public function getEnumName(): string {
-		return "enum#" . spl_object_id($this->parameterData->enum);
+		return $this->name;
 	}
 
 	public function getValue(string $string) {
